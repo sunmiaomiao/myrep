@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+            list-style: none;
+            border: 0;
+        }
+
+        .all {
+            width: 500px;
+            height: 200px;
+            padding: 7px;
+            border: 1px solid #ccc;
+            margin: 100px auto;
+            position: relative;
+        }
+
+        .screen {
+            width: 500px;
+            height: 200px;
+            /*overflow: hidden;*/
+            position: relative;
+        }
+
+        .screen li {
+            width: 500px;
+            height: 200px;
+            overflow: hidden;
+            float: left;
+        }
+
+        .screen ul {
+            position: absolute;
+            left: 0;
+            top: 0px;
+            width: 3000px;
+        }
+
+        .all ol {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            line-height: 20px;
+            text-align: center;
+        }
+
+        .all ol li {
+            float: left;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border: 1px solid #ccc;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .all ol li.current {
+            background: yellow;
+        }
+
+        #arr {
+            display: none;
+        }
+
+        #arr span {
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            margin-top: -20px;
+            background: #000;
+            cursor: pointer;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            font-family: '黑体';
+            font-size: 30px;
+            color: #fff;
+            opacity: 0.3;
+            border: 1px solid #fff;
+        }
+
+        #arr #right {
+            right: 5px;
+            left: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="all" id='box'>
+    <div class="screen">
+        <ul>
+            <li><img src="images/1.jpg" width="500" height="200"/></li>
+            <li><img src="images/2.jpg" width="500" height="200"/></li>
+            <li><img src="images/3.jpg" width="500" height="200"/></li>
+            <li><img src="images/4.jpg" width="500" height="200"/></li>
+            <li><img src="images/5.jpg" width="500" height="200"/></li>
+        </ul>
+        <ol>
+        </ol>
+    </div>
+    <div id="arr"><span id="left">&lt;</span><span id="right">&gt;</span></div>
+</div>
+<script>
+   //动态生成最后一张图片和li
+    var box=document.getElementById("box");
+    var screen=box.children[0];
+    var ul=screen.children[0];
+    var ulLis=ul.children;
+    var ol=screen.children[1];
+   //动态生成ol-LI
+   for (var i = 0; i < ulLis.length; i++) {
+       var li=document.createElement("li");
+       ol.appendChild(li);
+       li.innerHTML=i+1;
+       var olLis=ol.children;
+   }
+   //动态生成最后一张图片
+    var lasrImg=ulLis[0].cloneNode(true);
+    ul.appendChild(lasrImg);
+
+
+    //2鼠标经过li时，排他利己，相应的ul移动位置
+   for (var j = 0; j < olLis.length; j++) {
+       var olli = olLis[j];
+       olli.index=j;
+       olli.onmousemove=function(){
+           for (var k = 0; k < olLis.length; k++) {
+               var obj = olLis[k];
+               obj.className="";
+           }
+           this.className="current";
+           var target=-this.index*screen.offsetWidth;
+           animate(ul,target);
+       }
+
+   }
+   //3鼠标经过box，arr显示，左右按钮注册事件
+   //鼠标经过box，arr显示
+   var arr=document.getElementById("arr");
+   var left=document.getElementById("left");
+   var right=document.getElementById("right");
+   box.onmouseover=function(){
+       arr.style.display="block";
+   }
+   box.onmouseout=function(){
+       arr.style.display="none";
+   }
+   //右按钮注册事件
+   var pic=0;
+   right.onclick=function(){
+       if(pic==ulLis.length-1){
+           ul.offsetLeft="0px";
+           pic=0;
+       }else{
+           pic++;
+           var target=-pic*screen.offsetWidth;
+           animate(ul,target)
+       }
+
+   }
+   //左按钮注册事件
+   var pic=0;
+   left.onclick=function(){
+       if(pic==0){
+           ul.offsetLeft=-(ulLis.length-1)*screen.offsetWidth;
+           pic=ulLis.length-1;
+       }else{
+           pic--;
+           var target=-pic*screen.offsetWidth;
+           animate(ul,target)
+       }
+
+   }
+
+
+
+
+   function animate(obj, target) {
+       clearInterval(obj.timer);
+       obj.timer = setInterval(function () {
+           var leader = obj.offsetLeft;
+           /*//如果offsetLeft<target 说明 盒子在目标左侧 应该往右走 step是正数
+            if (obj.offsetLeft < target) {
+            var step = 10;
+            }
+            //如果offsetLeft>target 说明 盒子在目标右侧 应该往左走 step是负数
+            if (obj.offsetLeft > target) {
+            var step = -10;
+            }*/
+           var step = 20;
+           step = obj.offsetLeft < target ? step : -step;
+           leader = leader + step;
+           if (Math.abs(obj.offsetLeft - target) > Math.abs(step)) {
+               obj.style.left = leader + "px";
+           } else {
+               obj.style.left = target + "px";
+               clearInterval(obj.timer);
+           }
+       }, 15)
+   }
+
+
+
+
+
+</script>
+</body>
+</html>
